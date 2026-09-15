@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Target, Zap, Wrench } from "lucide-react";
+import { Target, Users, Zap, Wrench } from "lucide-react";
 import clsx from "clsx";
 
 const NAV = [
   { href: "/",             icon: Target, label: "Настройки" },
+  { href: "/teams",        icon: Users,  label: "Команды" },
   { href: "/optimization", icon: Zap,    label: "Оптимизация" },
   { href: "/specialists",  icon: Wrench, label: "Оптимизаторы" },
 ];

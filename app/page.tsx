@@ -1,69 +1,92 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Search } from "lucide-react";
+import { PlayerCard } from "@/components/PlayerCard";
+import { players } from "@/lib/players";
+import clsx from "clsx";
+
+const FILTERS = [
+  { id: "all",      label: "Все" },
+  { id: "pro",      label: "Про-игроки" },
+  { id: "streamer", label: "Стримеры" },
+];
+
+export default function HomePage() {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const filtered = players.filter((p) => {
+    if (filter === "pro" && p.teamId === "streamer") return false;
+    if (filter === "streamer" && p.teamId !== "streamer") return false;
+    if (search && !p.nickname.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight">
+          Настройки про-игроков <span className="text-accent">CS2</span>
+        </h1>
+        <p className="text-muted mt-2 max-w-2xl">
+          Конфиги, прицелы, девайсы и параметры запуска профессиональных игроков и стримеров.
+        </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between"
+      >
+        <div className="flex gap-1 p-1 bg-surface border border-border rounded-lg">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={clsx(
+                "px-3 py-1.5 rounded-md text-xs font-medium transition",
+                filter === f.id ? "bg-accent text-bg" : "text-muted hover:text-text"
+              )}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              {f.label}
+            </button>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="flex items-center gap-2 px-3 h-9 rounded-lg bg-surface border border-border text-sm w-full md:w-72">
+          <Search size={15} className="text-muted" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Поиск игрока..."
+            className="flex-1 bg-transparent outline-none placeholder:text-subtle text-sm"
+          />
         </div>
-      </main>
+      </motion.div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filtered.map((p, i) => (
+          <motion.div
+            key={p.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 + i * 0.04, duration: 0.4 }}
+          >
+            <PlayerCard player={p} />
+          </motion.div>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center py-20 text-muted">Ничего не найдено</div>
+      )}
     </div>
   );
 }

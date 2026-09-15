@@ -3,10 +3,11 @@
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check } from "lucide-react";
+import { ArrowLeft, Copy, Check, Twitch } from "lucide-react";
 import { useState } from "react";
 import { getPlayer } from "@/lib/players";
 import clsx from "clsx";
+import { TwitchIcon } from "@/components/TwitchIcon";
 
 export default function PlayerPage() {
   const params = useParams();
@@ -34,6 +35,7 @@ export default function PlayerPage() {
         <ArrowLeft size={16} /> Назад
       </Link>
 
+      {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -59,7 +61,22 @@ export default function PlayerPage() {
               <span className="text-xs px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent/30">
                 {player.role}
               </span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-success/10 text-success border border-success/30">
+                ✓ Актуально на {player.updated}
+              </span>
             </div>
+
+            {player.twitch && (
+              <a
+                href={player.twitch}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-[#9146ff] text-white font-medium text-sm hover:bg-[#7a34e0] transition"
+              >
+                <TwitchIcon size={16} />
+                Смотреть на Twitch
+              </a>
+            )}
           </div>
         </div>
         {player.bio && <p className="text-muted text-sm mt-6 leading-relaxed">{player.bio}</p>}
@@ -112,17 +129,17 @@ export default function PlayerPage() {
         </Section>
       )}
 
-      <Section title="Параметры запуска" delay={0.3}>
+      <Section title="Viewmodel (команды для консоли)" delay={0.3}>
         <button
-          onClick={() => copy(player.launchOptions.join(" "), "launch")}
+          onClick={() => copy(player.viewmodel, "viewmodel")}
           className="w-full text-left p-4 rounded-xl bg-surface border border-border hover:border-accent/50 transition group"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted mb-2">Launch Options — клик чтобы скопировать</div>
-              <code className="text-sm text-accent break-all">{player.launchOptions.join(" ")}</code>
+              <div className="text-xs text-muted mb-2">Вставь в консоль CS2</div>
+              <code className="text-xs text-accent break-all">{player.viewmodel}</code>
             </div>
-            {copied === "launch" ? (
+            {copied === "viewmodel" ? (
               <Check size={18} className="text-success shrink-0" />
             ) : (
               <Copy size={18} className="text-muted group-hover:text-accent transition shrink-0" />
@@ -131,14 +148,26 @@ export default function PlayerPage() {
         </button>
       </Section>
 
-      <Section title="Viewmodel" delay={0.35}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat label="FOV" value={player.viewmodel.fov} />
-          <Stat label="Offset X" value={player.viewmodel.offsetX} />
-          <Stat label="Offset Y" value={player.viewmodel.offsetY} />
-          <Stat label="Offset Z" value={player.viewmodel.offsetZ} />
-        </div>
-      </Section>
+      {player.launchOptions.length > 0 && (
+        <Section title="Параметры запуска" delay={0.35}>
+          <button
+            onClick={() => copy(player.launchOptions.join(" "), "launch")}
+            className="w-full text-left p-4 rounded-xl bg-surface border border-border hover:border-accent/50 transition group"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted mb-2">Launch Options — клик чтобы скопировать</div>
+                <code className="text-sm text-accent break-all">{player.launchOptions.join(" ")}</code>
+              </div>
+              {copied === "launch" ? (
+                <Check size={18} className="text-success shrink-0" />
+              ) : (
+                <Copy size={18} className="text-muted group-hover:text-accent transition shrink-0" />
+              )}
+            </div>
+          </button>
+        </Section>
+      )}
 
       {player.binds.length > 0 && (
         <Section title="Ключевые бинды" delay={0.4}>

@@ -1,36 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { PlayerCard } from "@/components/PlayerCard";
 import { players } from "@/lib/players";
+import { teams } from "@/lib/teams";
 import clsx from "clsx";
 
-const FILTERS = [
+const ROLE_FILTERS = [
   { id: "all",      label: "Все" },
   { id: "pro",      label: "Про-игроки" },
   { id: "streamer", label: "Стримеры" },
 ];
 
 export default function HomePage() {
-  const [filter, setFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [teamFilter, setTeamFilter] = useState("all");
   const [search, setSearch] = useState("");
 
+  const availableTeams = useMemo(() => {
+    const ids = new Set(players.map((p) => p.teamId));
+    return teams.filter((t) => ids.has(t.id));
+  }, []);
+
   const filtered = players.filter((p) => {
-    if (filter === "pro" && p.teamId === "streamer") return false;
-    if (filter === "streamer" && p.teamId !== "streamer") return false;
+    if (roleFilter === "pro" && p.teamId === "streamer") return false;
+    if (roleFilter === "streamer" && p.teamId !== "streamer") return false;
+    if (teamFilter !== "all" && p.teamId !== teamFilter) return false;
     if (search && !p.nickname.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
   return (
-    <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <div className="space-y-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight">
           Настройки про-игроков <span className="text-accent">CS2</span>
         </h1>
@@ -46,13 +50,13 @@ export default function HomePage() {
         className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between"
       >
         <div className="flex gap-1 p-1 bg-surface border border-border rounded-lg">
-          {FILTERS.map((f) => (
+          {ROLE_FILTERS.map((f) => (
             <button
               key={f.id}
-              onClick={() => setFilter(f.id)}
+              onClick={() => setRoleFilter(f.id)}
               className={clsx(
                 "px-3 py-1.5 rounded-md text-xs font-medium transition",
-                filter === f.id ? "bg-accent text-bg" : "text-muted hover:text-text"
+                roleFilter === f.id ? "bg-accent text-bg" : "text-muted hover:text-text"
               )}
             >
               {f.label}
@@ -71,13 +75,51 @@ export default function HomePage() {
         </div>
       </motion.div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        className="flex flex-wrap gap-2"
+      >
+        <button
+          onClick={() => setTeamFilter("all")}
+          className={clsx(
+            "px-3 py-1.5 rounded-full text-xs font-medium transition border",
+            teamFilter === "all"
+              ? "bg-accent text-bg border-accent"
+              : "bg-surface border-border text-muted hover:text-text hover:border-border-hover"
+          )}
+        >
+          Все команды
+        </button>
+        {availableTeams.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTeamFilter(t.id)}
+            className={clsx(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition border flex items-center gap-1.5",
+              teamFilter === t.id
+                ? "bg-accent text-bg border-accent"
+                : "bg-surface border-border text-muted hover:text-text hover:border-border-hover"
+            )}
+          >
+            <span>{t.country}</span>
+            {t.shortName}
+          </button>
+        ))}
+      </motion.div>
+
+      <p className="text-xs text-subtle">
+        Найдено: <span className="text-accent font-medium">{filtered.length}</span> игроков
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filtered.map((p, i) => (
           <motion.div
             key={p.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + i * 0.04, duration: 0.4 }}
+            transition={{ delay: 0.2 + i * 0.03, duration: 0.4 }}
           >
             <PlayerCard player={p} />
           </motion.div>

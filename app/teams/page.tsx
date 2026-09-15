@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { teams } from "@/lib/teams";
 import { players } from "@/lib/players";
+import { TeamLogo } from "@/components/TeamLogo";
 
 export default function TeamsPage() {
   return (
@@ -32,12 +33,12 @@ export default function TeamsPage() {
               <Link href={`/teams/${team.id}`}>
                 <div className="glass rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/10 h-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold border border-border"
-                      style={{ background: `${team.accent}15`, color: team.accent }}
-                    >
-                      {team.shortName[0]}
-                    </div>
+                    <TeamLogo
+                      teamId={team.id}
+                      shortName={team.shortName}
+                      accent={team.accent}
+                      size={56}
+                    />
                     <div className="min-w-0">
                       <h3 className="font-semibold text-lg truncate">{team.name}</h3>
                       <p className="text-xs text-muted">{team.country}</p>

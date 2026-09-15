@@ -3,11 +3,13 @@
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, Twitch } from "lucide-react";
+import { ArrowLeft, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { getPlayer } from "@/lib/players";
-import clsx from "clsx";
+import { getTeam } from "@/lib/teams";
 import { TwitchIcon } from "@/components/TwitchIcon";
+import { TeamLogo } from "@/components/TeamLogo";
+import clsx from "clsx";
 
 export default function PlayerPage() {
   const params = useParams();
@@ -22,6 +24,9 @@ export default function PlayerPage() {
       </div>
     );
   }
+
+  const team = getTeam(player.teamId);
+  const showTeamLogo = player.teamId !== "streamer" && team !== undefined;
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -43,9 +48,21 @@ export default function PlayerPage() {
         className="glass rounded-2xl p-8"
       >
         <div className="flex flex-wrap items-start gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-surface border border-border flex items-center justify-center text-3xl font-bold text-accent">
-            {player.nickname[0].toUpperCase()}
+          {/* Двойной аватар: команда + игрок */}
+          <div className="flex items-center gap-3">
+            {showTeamLogo && team && (
+              <TeamLogo
+                teamId={team.id}
+                shortName={team.shortName}
+                accent={team.accent}
+                size={64}
+              />
+            )}
+            <div className="w-16 h-16 rounded-2xl bg-surface border border-border flex items-center justify-center text-2xl font-bold text-accent">
+              {player.nickname[0].toUpperCase()}
+            </div>
           </div>
+
           <div className="flex-1 min-w-[240px]">
             <div className="flex items-center gap-2 mb-1">
               <h1 className="text-3xl font-semibold tracking-tight">{player.nickname}</h1>

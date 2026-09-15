@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { getTeam } from "@/lib/teams";
 import { getPlayersByTeam } from "@/lib/players";
 import { PlayerCard } from "@/components/PlayerCard";
+import { TeamLogo } from "@/components/TeamLogo";
 
 export default function TeamPage() {
   const params = useParams();
@@ -40,12 +41,12 @@ export default function TeamPage() {
           style={{ background: `radial-gradient(circle, ${team.accent}, transparent 70%)` }}
         />
         <div className="relative flex flex-wrap items-center gap-6">
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold border border-border"
-            style={{ background: `${team.accent}15`, color: team.accent }}
-          >
-            {team.shortName[0]}
-          </div>
+          <TeamLogo
+            teamId={team.id}
+            shortName={team.shortName}
+            accent={team.accent}
+            size={80}
+          />
           <div className="flex-1 min-w-[240px]">
             <h1 className="text-3xl font-semibold tracking-tight">{team.name}</h1>
             <p className="text-muted mt-1">{team.country}</p>

@@ -20,3 +20,4 @@ export const teams: Team[] = [
   { id: "c9",       name: "Cloud9",        shortName: "C9",     country: "🇷🇺", accent: "#00aeef" },
   { id: "ww",       name: "WW Team",       shortName: "WW",     country: "🇷🇺", accent: "#7c3aed" },
 ];
+export const getTeam = (id: string) => teams.find((t) => t.id === id);
